@@ -1,0 +1,111 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Ex2 Explore</title>
+  <meta name="viewport" content="initial-scale=1.0">
+  <meta charset="utf-8">
+  <style>
+  /* Always set the map height explicitly to define the size of the div
+  * element that contains the map. */
+  #map1 {
+    height: 400px;
+    width: 800px;
+  }
+  /* Optional: Makes the sample page fill the window. */
+  html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+  }
+  </style>
+</head>
+<body>
+  <div id="map1"></div>
+  <script>
+  var locationObj1 = {
+    locName: "SC&I",
+    category: "Building",
+    info: "SC&I Main Building",
+    address: "4 Huntington Street, New Brunswick, NJ",
+    //position: {lat: 40.5053128, lng: -74.4531979},
+    position: {lat: 0, lng: 0},
+    mapToUse: "map1"
+  };
+  var locationObj2 = {
+    locName: "Rutgers Club",
+    category: "Restaurant",
+    info: "Rutgers Club Restaurant ...",
+    address: "199 College Avenue New Brunswick, NJ",
+    //position: {lat: 40.5058682, lng: -74.45404359999998},
+    position: {lat: 0, lng: 0},
+    mapToUse: "map1"
+  };
+  var locationArray = [locationObj1, locationObj2];
+  var map1;
+  function initMap() {
+    var centerPos = {lat: 40.5053128, lng: -74.4531979};
+    //var marker1Pos = {lat: 40.5053128, lng: -74.4531979};
+    map1 = new google.maps.Map(document.getElementById('map1'), {
+      center: centerPos,
+      zoom: 18,
+      minZoom: 18,
+      maxZoom: 18,
+      mapTypeId: google.maps.MapTypeId.ROADMAP,
+      draggable: false,
+      scrollwheel: false
+    });
+    // var marker1 = new google.maps.Marker({
+    //   position: marker1Pos,
+    //   map: map1,
+    //   title: 'Hello World!'
+    // });
+    // var contentString = 'Hello World';
+    // var infowindow1 = new google.maps.InfoWindow({
+    //   content: contentString
+    // });
+    // marker1.addListener('click', function() {
+    //   infowindow1.open(map, marker1);
+    // });
+    // place marker
+    //placeMarker(locationObj1, map1);
+    var geocoderToUse = new google.maps.Geocoder();
+    var numLocations = locationArray.length;
+    for (i = 0; i < numLocations; i++) {
+      automateGeocodePlaceMarker(geocoderToUse, i);
+    }
+  }
+  // automate geocoding
+  function automateGeocodePlaceMarker(geocoderUse, locIndex) {
+    var locationObjUse = locationArray[locIndex];
+    geocoderUse.geocode({'address': locationObjUse.address},
+      function(results, status) {
+        if (status === 'OK') {
+          console.log("before geocode " + locationObjUse.position.lat);
+          console.log("geocode " + results[0].geometry.location.toString());
+          locationObjUse.position = results[0].geometry.location;
+          var mapToUse;
+          if (locationObjUse.mapToUse == "map1") {
+            mapToUse = map1;
+          }
+          placeMarker(locationObjUse, mapToUse);
+          //
+        } else {
+          alert('Geocode was not successful for the following reason: ' + status);
+        }
+    });
+  }
+  // create marker
+  function placeMarker(locationObj, mapToUse) {
+    console.log("placeMarker " + locationObj.position.lat + " " + locationObj.position.lng);
+    var marker = new google.maps.Marker({
+      position: locationObj.position,
+      map: map1,
+      title: locationObj.locName
+    });
+  }
+  </script>
+  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDo5hIhoLZNctZbJoL_bWDDoitGAesMdw8&callback=initMap"
+  async defer></script>
+</body>
+</html>

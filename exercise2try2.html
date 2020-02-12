@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <title>Old Home, New Home</title>
+  <meta name="viewport" content="initial-scale=1.0">
+  <meta charset="utf-8">
+  <!-- internal CSS -->
+  <style>
+  /* Always set the map height explicitly to define the size of the div
+  * element that contains the map. */
+  #map1 {
+    height: 400px;
+    width: 800px;
+    margin: 20px;
+    margin-bottom: 35px;
+  }
+  #map2 {
+    height: 400px;
+    width: 800px;
+    margin: 20px;
+  }
+  /* Optional: Makes the sample page fill the window. */
+  html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+  }
+  form {
+    margin-left: 20px;
+  }
+  .category {
+    width: 75px;
+    float: left;
+    margin-right: 10px;
+  }
+  .windowContent {
+    border-style: solid;
+    border-width: 2px;
+    border-left-width: 10px;
+  }
+  </style>
+
+</head>
+<body>
+  <!-- form -->
+  <div>
+    <form name="myForm" id="myForm">
+      <p>Show Category:
+        <input type="radio" name="category" value="yes" checked>Yes
+        <input type="radio" name="category" value="no">No
+      </p>
+      <p>
+        <input type="checkbox" name="whatToShow" id="TeaShops" value="TeaShops" checked>Tea Shops
+        <input type="checkbox" name="whatToShow" id="Takeout" value="Takeout" checked>Takeout
+        <input type="checkbox" name="whatToShow" id="Books" value="Books" checked>Libraries & Bookstores
+        <input type="checkbox" name="whatToShow" id="POInterest" value="POInterest" checked>Points of Interest
+        <input type="submit" value="Update">
+      </p>
+    </form>
+  </div>
+  <!-- maps -->
+  <div id="map1"></div>
+  <div id="map2"></div>
+
+
+  <script>
+  // location objects
+  var locationObj1 = {
+    locName: "SocraTea",
+    category: "TeaShops",
+    info: "SocraTea is my favorite tea place in Detroit and a great place to study.  They import all their teas through Germany and use hand-made ceramics from the studio next door.",
+    address: "71 Garfield St, Detroit, MI",
+    position: {lat: 0, lng: 0},
+    marker: null,
+    mapToUse: "map1"
+  };
+  var locationObj2 = {
+    locName: "Red Hook",
+    category: "TeaShops",
+    info: "Red Hook is a coffee shop and roaster that also sells delicious baked goods.  It's louder and more of a hangout spot, but it's small enough that it can be hard to get a table.",
+    address: "220 W Nine Mile Rd, Ferndale, MI",
+    position: {lat: 0, lng: 0},
+    marker: null,
+    mapToUse: "map1"
+  };
+  var locationObj3 = {
+    locName: "Bangkok Cafe",
+    category: "Takeout",
+    info: "This place has really good Thai food and also the friendliest waitstaff of any place I've ever been.",
+    address: "323 W Nine Mile Rd, Ferndale, MI",
+    position: {lat: 0, lng: 0},
+    marker: null,
+    mapToUse: "map1"
+  };
+  var locationObj4 = {
+    locName: "Detroit One Coney Island",
+    category: "Takeout",
+    info: "Coney Islands are what Detroiters call late-night diners.  This one has a drive thru where you can sit for however long it takes to make whatever you've ordered, 24 hours a day.",
+    address: "5 W Seven Mile Rd, Highland Park, MI",
+    position: {lat: 0, lng: 0},
+    marker: null,
+    mapToUse: "map1"
+  };
+  var locationObj5 = {
+    locName: "Lincoln Branch, Detroit Public Library",
+    category: "Books",
+    info: "This is the closest branch of the DPL, but it is only open certain days a week for very limited hours.",
+    address: "1221 E Seven Mile Rd, Detroit, MI",
+    position: {lat: 0, lng: 0},
+    marker: null,
+    mapToUse: "map1"
+  };
+  var locationObj6 = {
+    locName: "John K King North",
+    category: "Books",
+    info: "John King is one of the largest used bookstores in the US, and this is its northern outpost.  You can find sheet music from the 1930s or out-of-print magazines from the 1970s.",
+    address: "22524 Woodward Ave, Ferndale, MI",
+    position: {lat: 0, lng: 0},
+    marker: null,
+    mapToUse: "map1"
+  };
+  var locationObj7 = {
+    locName: "Ford Highland Park Plant",
+    category: "POInterest",
+    info: "This abandoned auto plant is where the Model T was produced.  It's one of Detroit's several large, abandoned auto plants where people take ruin porn photos.",
+    address: "14522 Woodward Ave, Highland Park, MI",
+    position: {lat: 0, lng: 0},
+    marker: null,
+    mapToUse: "map1"
+  };
+  var locationObj8 = {
+    locName: "Detroit Institute of Arts",
+    category: "POInterest",
+    info: "The Detroit Institute of Arts is a large, expansive art museum featuring a wide variety of collections and Diego Rivera's phenomemanl Detroit Industry Murals.",
+    address: "5200 Woodward Ave, Detroit, MI",
+    position: {lat: 0, lng: 0},
+    marker: null,
+    mapToUse: "map1"
+  };
+  var locationObj9 = {
+    locName: "Royal Coffee",
+    category: "TeaShops",
+    info: "Royal Coffee is a relaxed neighborhood spot serving Ethiopian coffee and vegan lunch.",
+    address: "6764 N Sheridan Rd, Chicago, IL",
+    position: {lat: 0, lng: 0},
+    marker: null,
+    mapToUse: "map2"
+  };
+  var locationObj10 = {
+    locName: "Argo Tea",
+    category: "TeaShops",
+    info: "This tea place is aimed at college students and has a ton of bright colors in it and plays music.  It might be the best I can do close to home in Rogers Park.",
+    address: "6576 N Sheridan Rd, Chicago, IL",
+    position: {lat: 0, lng: 0},
+    marker: null,
+    mapToUse: "map2"
+  };
+  var locationObj11 = {
+    locName: "Taste of Peru",
+    category: "Takeout",
+    info: "Casual Peruvian place.  I've never had Peruvian food, so we'll see how this is.",
+    address: "6545 N Clark St, Chicago, IL",
+    position: {lat: 0, lng: 0},
+    marker: null,
+    mapToUse: "map2"
+  };
+  var locationObj12 = {
+    locName: "Smack Dab",
+    category: "Takeout",
+    info: "A local donut and breakfast sandwich place.",
+    address: "6730 N Clark St, Chicago, IL",
+    position: {lat: 0, lng: 0},
+    marker: null,
+    mapToUse: "map2"
+  };
+  var locationObj13 = {
+    locName: "Armadillo's Pillow",
+    category: "Books",
+    info: "This is a one-man used bookstore with a huge selection of primarily books I've never heard of and some gigantic cushion chairs for reading.",
+    address: "6753 N Sheridan Rd, Chicago, IL",
+    position: {lat: 0, lng: 0},
+    marker: null,
+    mapToUse: "map2"
+  };
+  var locationObj14 = {
+    locName: "Rogers Park Branch, Chicago Public Library",
+    category: "Books",
+    info: "The Chicago Public Library has 84 branches, and this is going to be mine.  Getting my library card is one of my first priorities in my new city.",
+    address: "6907 N Clark St, Chicago, IL",
+    position: {lat: 0, lng: 0},
+    marker: null,
+    mapToUse: "map2"
+  };
+  var locationObj15 = {
+    locName: "Tobey Prinz Beach Park",
+    category: "POInterest",
+    info: "Prinz Beach Park is the start of a beachside boardwalk that stretches north toward Evanston.  It was named for a civil rights and community activist from Rogers Park.  The beach is only a block from my apartment, which is terribly exciting.",
+    address: "1050 W Pratt Ave, Chicago, IL",
+    position: {lat: 0, lng: 0},
+    marker: null,
+    mapToUse: "map2"
+  };
+  var locationObj16 = {
+    locName: "Emil Bach House",
+    category: "POInterest",
+    info: "The Emil Bach House is a Frank Lloyd Wright home in the Prairie style that's still a private house.  It has a great beach view but you have to rent it to see it.",
+    address: "7415 N Sheridan Rd, Chicago, IL",
+    position: {lat: 0, lng: 0},
+    marker: null,
+    mapToUse: "map2"
+  };
+
+  var locationArray = [locationObj1, locationObj2, locationObj3, locationObj4, locationObj5, locationObj6, locationObj7, locationObj8, locationObj9, locationObj10, locationObj11, locationObj12, locationObj13, locationObj14, locationObj15, locationObj16];
+  var map1;
+  var map2;
+
+  // initMap function
+  function initMap() {
+    var center1 = {lat: 42.427770, lng: -83.104760};
+    var center2 = {lat: 42.011855, lng: -87.661264};
+    map1 = new google.maps.Map(document.getElementById('map1'), {
+      center: center1,
+      zoom: 11,
+      minZoom: 5,
+      maxZoom: 17,
+      mapTypeId: google.maps.MapTypeId.ROADMAP,
+      draggable: true,
+      scrollwheel: false
+    });
+    map2 = new google.maps.Map(document.getElementById('map2'), {
+      center: center2,
+      zoom: 14,
+      minZoom: 5,
+      maxZoom: 17,
+      mapTypeId: google.maps.MapTypeId.ROADMAP,
+      draggable: true,
+      scrollwheel: false
+    });
+    console.log("maps created");
+    var geocoderToUse = new google.maps.Geocoder();
+    /*  for (i = 0; i < numLocations; i++) {
+    automateGeocodePlaceMarker(geocoderToUse, i);
+  } */
+  automateGeocodePlaceMarker(geocoderToUse, 0);
+}
+//automate geocoding
+function automateGeocodePlaceMarker(geocoderToUse, locIndex) {
+  var locationObjUse = locationArray[locIndex];
+  geocoderToUse.geocode({'address': locationObjUse.address},
+  function(results, status) {
+    if (status === 'OK') {
+      //console.log("before geocode " + locationObjUse.position.lat);
+      //console.log("geocode " + results[0].geometry.location.toString());
+      locationObjUse.position = results[0].geometry.location;
+      var mapToUse;
+      if (locationObjUse.mapToUse == "map1") {
+        mapToUse = map1;
+      }
+      if (locationObjUse.mapToUse == "map2") {
+        mapToUse = map2;
+      }
+      placeMarker(locationObjUse, mapToUse);
+      var numLocations = locationArray.length;
+      var locIndexNext = locIndex+1;
+      if (locIndexNext < numLocations) {
+        automateGeocodePlaceMarker(geocoderToUse, locIndex+1);
+      }
+    } else {
+      alert('Geocode was not successful for the following reason: ' + status);
+      setTimeout(function(){automateGeocodePlaceMarker(geocoderToUse, locIndex);}, 3000);
+    }
+  });
+}
+//custom markers
+var iconBase = 'https://maps.google.com/mapfiles/kml/shapes/';
+var icons = {
+  TeaShops: {
+    icon: iconBase + 'coffee.png'
+  },
+  Takeout: {
+    icon: iconBase + 'dining.png'
+  },
+  Books: {
+    icon: iconBase + 'schools.png'
+  },
+  POInterest: {
+    icon: iconBase + 'poi.png'
+  }
+};
+
+//placeMarker function
+function placeMarker(locationObj, mapToUse) {
+  var marker = new google.maps.Marker({
+    position: locationObj.position,
+    map: mapToUse,
+    icon: icons[locationObj.category].icon,
+    title: locationObj.locName,
+  });
+  locationObj.marker = marker;
+  var h2String = '<h2>'+ locationObj.locName + '</h2>';
+  var categoryString = '<p class="category">'+ locationObj.category + '</p>';
+  var infoString = '<p>'+ locationObj.info + '</p>';
+  marker.addListener('click', function() {
+    var showCategory = document.forms["myForm"]["category"].value;
+    var contentString = h2String + categoryString + infoString;
+    if (showCategory == "no") {
+      contentString = h2String + infoString; }
+      var infowindow = new google.maps.InfoWindow({
+        content: contentString,
+        maxWidth: 400
+      });
+      marker.addListener('click', function() {
+        infowindow.open(mapToUse, marker);
+      });
+    });
+  }
+
+  //updateMaps, change which markers are shown
+  var myForm = document.getElementById('myForm');
+  myForm.addEventListener('submit', updateMaps);
+
+  function updateMaps(event) {
+    event.preventDefault();
+    for(var i=0; i < locationArray.length; i++) {
+      var locationObj = locationArray[i];
+      var markerObj = locationObj.marker;
+      var categoryString = locationObj.category;
+      var checkboxStatus = document.getElementById(categoryString).checked;
+      var mapToUse = null;
+      if(locationObj.mapToUse == "map1") {
+        mapToUse = map1;
+      }
+      else if(locationObj.mapToUse == "map2") {
+        mapToUse = map2;
+      }
+      if(checkboxStatus) {
+        //category selected
+        markerObj.setMap(mapToUse);
+      } else {
+        //category not selected
+        markerObj.setMap(null);
+      }
+    }
+  }
+</script>
+
+<!-- Google maps API -->
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD9mK-Hu_jVRWwF7S9AHtu736kFN1tK6Ro&callback=initMap"
+async defer></script>
+</body>
+</html>
